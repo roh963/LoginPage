@@ -25,7 +25,7 @@ const signUp = async (req, res, next) => {
     });
   }
   try {
-    //    const  userInfo = userModel(req.body)
+      //  const  userInfo = userModel(req.body)
 
     //if not equal schema n e p
     const userInfo = userModel({
@@ -49,33 +49,74 @@ const signUp = async (req, res, next) => {
     }
     return res.status(400).json({
       success: false,
-      message: e.message,
+      message: error.message,
     });
   }
 };
 
-const signIn = async () => {
-const {email,password} =req.body;
-if (!email || !password) {
+const signIn = async (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return res.status(400).json({
+      success: false,
+      message: "Every field is required ",
+    });
+  }
+  try {
+    const user = await userModel
+      .findOne({email})
+      .select('+password');
+    if (!user) {
+      return res.status(400).json({
         success: false,
-        message: "Every field is required ",
-      }); 
-}
-const user = await userModel
-                            .findOne({
-                                email
-                            }).select(`+password`);
-if(!user || user.password !== password ){
-    return res.status(400).json({
-        success: false,
-        message: "Invalid crendential ",
+        message: "Invalid crendential user ",
       });
-}                            
-                            
+    }
+    if ( user.password !== password) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid crendential password ",
+      });
+    }
+    const token = user.jwtToken();
+    user.password = undefined;
+
+    const cookieOption = {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    };
+    res.cookie("token", token, cookieOption);
+    res.status(200).json({
+        success: true,
+        data: user,
+      });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
+
+const getUser=async(req,res,next)=>{
+    const userId = req.user.id;
+
+    try {
+      const user = await userModel.findById(userId);
+      return res.status(200).json({
+        success: true,
+        data: user,
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+}
 
 module.exports = {
   signUp,
-  signIn
+  signIn,
+  getUser
 };

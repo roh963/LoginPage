@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
-const MONGO_URL = process.env.DB||"mongodb://localhost:27017/Signup";
+const MONGO_URL = process.env.DB||"mongodb://localhost:27017/user";
+// const MONGO_URL = "mongodb://localhost:27017/user";
 
 
 const databaseconnect = ()=>{
