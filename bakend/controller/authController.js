@@ -115,8 +115,27 @@ const getUser=async(req,res,next)=>{
     }
 }
 
+const logOut = async(req,res)=>{
+  try {
+    const cookieOption = {
+      maxAge: new Date(),
+      httpOnly: true,
+    };
+    res.cookie("token",null,cookieOption)
+    return res.status(200).json({
+      success: true,
+      data: "logout user",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
 module.exports = {
   signUp,
   signIn,
-  getUser
+  getUser,
+  logOut
 };
