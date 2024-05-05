@@ -10,12 +10,12 @@ const jwtAuth =  (req, res , next)=>{
 
     try {
          
-        const playload = JWT.verify(token , process.env.SECRET)
-        req.user={id:playload.id ,email:playload.email};
+        const playload = JWT.verify(token, process.env.SECRET)
+        req.user={ id:playload.id ,email: playload.email};
     } catch (error) {
         return res.status(400).json({
             success: false,
-            message: error.message,
+            message: error.message ,
           }); 
     }
     next();
